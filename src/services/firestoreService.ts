@@ -1,52 +1,65 @@
 // src/services/firestoreService.ts
 import {
-  collection,
   addDoc,
+  collection,
+  onSnapshot,
   query,
   where,
   orderBy,
-  onSnapshot,
-  Timestamp,
+  serverTimestamp,
+  DocumentData,
 } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 
-
-export interface Note {
+export type Note = {
   id?: string;
   userId: string;
   title: string;
   content: string;
-  createdAt?: Date | Timestamp;
-}
-
-export const addNote = async (
-  userId: string,
-  data: Omit<Note, "id" | "userId" | "createdAt">
-) => {
-  const colRef = collection(db, "notes");
-  return await addDoc(colRef, {
-    userId,
-    ...data,
-    createdAt: new Date(),
-  });
+  createdAt?: any;
 };
 
-export const listenUserNotes = (
+// Thêm 1 note mới
+export async function addNote(
   userId: string,
-  cb: (notes: Note[]) => void
-) => {
+  data: { title: string; content: string }
+) {
   const colRef = collection(db, "notes");
+  await addDoc(colRef, {
+    userId,
+    title: data.title,
+    content: data.content,
+    createdAt: serverTimestamp(),
+  });
+}
+
+// Lắng nghe danh sách note của 1 user
+export function listenUserNotes(
+  userId: string,
+  callback: (notes: Note[]) => void
+) {
+  const colRef = collection(db, "notes");
+
   const q = query(
     colRef,
     where("userId", "==", userId),
     orderBy("createdAt", "desc")
   );
 
-  return onSnapshot(q, (snapshot) => {
-    const items: Note[] = [];
+  const unsub = onSnapshot(q, (snapshot) => {
+    const list: Note[] = [];
     snapshot.forEach((doc) => {
-      items.push({ id: doc.id, ...(doc.data() as any) });
+      const data = doc.data() as DocumentData;
+      list.push({
+        id: doc.id,
+        userId: data.userId,
+        title: data.title,
+        content: data.content,
+        createdAt: data.createdAt,
+      });
     });
-    cb(items);
+    callback(list);
   });
-};
+
+  return unsub;
+}

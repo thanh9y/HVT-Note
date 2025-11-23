@@ -1,7 +1,9 @@
 // src/screens/ExportScreen.tsx
 import React from "react";
 import { View, Text, Button, StyleSheet, Share } from "react-native";
-import RNHTMLtoPDF from "react-native-html-to-pdf";  // import như vầy mới đúng
+// ⬇️ BỎ LỖI TS Ở ĐÂY – thư viện vẫn chạy bình thường
+// @ts-ignore
+import RNHTMLtoPDF from "react-native-html-to-pdf";
 
 const htmlContent = `
   <h1>Ghi chú của tôi</h1>
@@ -17,7 +19,7 @@ const ExportScreen: React.FC = () => {
         directory: "Documents",
       };
 
-      // phải ép kiểu vì TS không có type chính xác
+      // ⬇️ TS không có kiểu, nên cứ cho nó any
       const file = await (RNHTMLtoPDF as any).convert(options);
 
       await Share.share({

@@ -1,12 +1,14 @@
 // src/services/audioService.ts
-import { Audio, AVPlaybackStatus } from "expo-av";
+import { Audio } from "expo-av";
 import { uploadFileAsync } from "./storageService";
 
 let recordingInstance: Audio.Recording | null = null;
 
 export const startRecording = async () => {
   const { granted } = await Audio.requestPermissionsAsync();
-  if (!granted) throw new Error("Không có quyền sử dụng micro");
+  if (!granted) {
+    throw new Error("Không có quyền sử dụng micro");
+  }
 
   await Audio.setAudioModeAsync({
     allowsRecordingIOS: true,
@@ -15,7 +17,7 @@ export const startRecording = async () => {
 
   const recording = new Audio.Recording();
   await recording.prepareToRecordAsync(
-    Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+    Audio.RecordingOptionsPresets.HIGH_QUALITY
   );
   await recording.startAsync();
   recordingInstance = recording;

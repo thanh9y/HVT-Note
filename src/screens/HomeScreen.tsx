@@ -1,17 +1,15 @@
+// src/screens/HomeScreen.tsx
 import React, { useEffect, useState } from "react";
 import { View, Text, Button, FlatList, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { auth } from "../firebase/firebaseConfig";
 import { listenAuthChange, logout } from "../services/authService";
 import {
   addNote,
   listenUserNotes,
   Note,
 } from "../services/firestoreService";
-import { registerForPushNotificationsAsync } from "../services/notificationService";
 
-
-export default function HomeScreen() {
+const HomeScreen: React.FC = () => {
   const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
@@ -23,11 +21,11 @@ export default function HomeScreen() {
         router.replace("/login");
       } else {
         setUserId(user.uid);
-        setEmail(user.email);
+        setEmail(user.email ?? null);
       }
     });
     return () => unsub();
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     if (!userId) return;
@@ -35,22 +33,22 @@ export default function HomeScreen() {
     return () => unsub();
   }, [userId]);
 
-  useEffect(() => {
-    registerForPushNotificationsAsync();
-  }, []);
-
   const createDemoNote = async () => {
     if (!userId) return;
-    await addNote(userId, {
-      title: "Note demo",
-      content: "Nội dung demo",
-    });
+    await addNote(userId, { title: "Note demo", content: "Nội dung demo" });
   };
 
   const onLogout = async () => {
     await logout();
     router.replace("/login");
   };
+
+  const renderItem = ({ item }: { item: Note }) => (
+    <View style={styles.note}>
+      <Text style={styles.noteTitle}>{item.title}</Text>
+      <Text>{item.content}</Text>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -62,24 +60,21 @@ export default function HomeScreen() {
         title="Upload ảnh (AI mô tả)"
         onPress={() => router.push("/image-upload")}
       />
-      <Button title="Xuất PDF / DOCX" onPress={() => router.push("/export")} />
+      <Button title="Xuất PDF" onPress={() => router.push("/export")} />
 
       <Text style={styles.subtitle}>Danh sách note:</Text>
       <FlatList
         data={notes}
         keyExtractor={(item) => item.id!}
-        renderItem={({ item }) => (
-          <View style={styles.note}>
-            <Text style={styles.noteTitle}>{item.title}</Text>
-            <Text>{item.content}</Text>
-          </View>
-        )}
+        renderItem={renderItem}
       />
 
       <Button title="Đăng xuất" onPress={onLogout} color="red" />
     </View>
   );
-}
+};
+
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },

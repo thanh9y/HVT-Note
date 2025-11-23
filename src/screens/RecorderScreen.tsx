@@ -1,12 +1,11 @@
-// src/screens/RecorderScreen.ts
+// src/screens/RecorderScreen.tsx
 import React, { useState } from "react";
 import { View, Text, Button, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { auth } from "../firebase/firebaseConfig";
 import { startRecording, stopRecording } from "../services/audioService";
 
-
-export default function RecorderScreen() {
+const RecorderScreen: React.FC = () => {
   const router = useRouter();
   const user = auth.currentUser;
   const [isRecording, setIsRecording] = useState(false);
@@ -56,7 +55,9 @@ export default function RecorderScreen() {
       {audioUrl && <Text style={{ marginTop: 16 }}>URL: {audioUrl}</Text>}
     </View>
   );
-}
+};
+
+export default RecorderScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },

@@ -1,4 +1,4 @@
-// src/screens/ImageUploadScreen.ts
+// src/screens/ImageUploadScreen.tsx
 import React, { useState } from "react";
 import { View, Text, Button, Image, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
@@ -6,8 +6,7 @@ import * as ImagePicker from "expo-image-picker";
 import { auth } from "../firebase/firebaseConfig";
 import { uploadFileAsync } from "../services/storageService";
 
-
-export default function ImageUploadScreen() {
+const ImageUploadScreen: React.FC = () => {
   const router = useRouter();
   const user = auth.currentUser;
   const [imageUri, setImageUri] = useState<string | null>(null);
@@ -61,7 +60,9 @@ export default function ImageUploadScreen() {
       {imageUrl && <Text style={{ marginTop: 16 }}>Image URL: {imageUrl}</Text>}
     </View>
   );
-}
+};
+
+export default ImageUploadScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },

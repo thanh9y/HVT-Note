@@ -1,24 +1,32 @@
-// src/services/authService.js
-import { auth } from "../firebase/firebaseConfig";
+// src/services/authService.ts
 import {
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  User,
 } from "firebase/auth";
+import { auth } from "../firebase/firebaseConfig";
 
-export const register = (email, password) => {
-  return createUserWithEmailAndPassword(auth, email, password);
-};
+// Đăng ký
+export async function register(email: string, password: string) {
+  const cred = await createUserWithEmailAndPassword(auth, email, password);
+  return cred.user;
+}
 
-export const login = (email, password) => {
-  return signInWithEmailAndPassword(auth, email, password);
-};
+// Đăng nhập
+export async function login(email: string, password: string) {
+  const cred = await signInWithEmailAndPassword(auth, email, password);
+  return cred.user;
+}
 
-export const logout = () => {
-  return signOut(auth);
-};
+// Đăng xuất
+export async function logout() {
+  await signOut(auth);
+}
 
-export const listenAuthChange = (callback) => {
-  return onAuthStateChanged(auth, callback);
-};
+// Lắng nghe thay đổi trạng thái đăng nhập
+export function listenAuthChange(callback: (user: User | null) => void) {
+  const unsub = onAuthStateChanged(auth, callback);
+  return unsub;
+}

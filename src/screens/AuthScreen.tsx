@@ -1,14 +1,14 @@
 // src/screens/AuthScreen.tsx
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { login, register } from "../services/authService";
 
 const AuthScreen: React.FC = () => {
   const router = useRouter();
+  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLogin, setIsLogin] = useState(true);
 
   const onSubmit = async () => {
     try {
@@ -17,9 +17,9 @@ const AuthScreen: React.FC = () => {
       } else {
         await register(email, password);
       }
-      router.replace("/");
+      router.replace("/"); // về Home
     } catch (err: any) {
-      alert("Lỗi: " + err.message);
+      Alert.alert("Lỗi", err.message ?? "Có lỗi xảy ra");
     }
   };
 
@@ -27,23 +27,28 @@ const AuthScreen: React.FC = () => {
     <View style={styles.container}>
       <Text style={styles.title}>{isLogin ? "Đăng nhập" : "Đăng ký"}</Text>
       <TextInput
-        style={styles.input}
         placeholder="Email"
-        autoCapitalize="none"
+        style={styles.input}
         value={email}
         onChangeText={setEmail}
+        autoCapitalize="none"
       />
       <TextInput
-        style={styles.input}
         placeholder="Mật khẩu"
-        secureTextEntry
+        style={styles.input}
         value={password}
         onChangeText={setPassword}
+        secureTextEntry
       />
-      <Button title={isLogin ? "Đăng nhập" : "Đăng ký"} onPress={onSubmit} />
+
       <Button
-        title={isLogin ? "Chuyển sang đăng ký" : "Chuyển sang đăng nhập"}
-        onPress={() => setIsLogin(!isLogin)}
+        title={isLogin ? "Đăng nhập" : "Đăng ký"}
+        onPress={onSubmit}
+      />
+
+      <Button
+        title={isLogin ? "Chuyển sang Đăng ký" : "Chuyển sang Đăng nhập"}
+        onPress={() => setIsLogin((prev) => !prev)}
       />
     </View>
   );
@@ -53,12 +58,12 @@ export default AuthScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, justifyContent: "center" },
-  title: { fontSize: 24, marginBottom: 16, textAlign: "center" },
+  title: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 16 },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
+    borderRadius: 8,
     padding: 8,
     marginBottom: 12,
-    borderRadius: 8,
   },
 });
